@@ -1,0 +1,9 @@
+/home/max/Downloads/files/build/CMakeFiles/multichat.dir
+/home/max/Downloads/files/build/CMakeFiles/edit_cache.dir
+/home/max/Downloads/files/build/CMakeFiles/rebuild_cache.dir
+/home/max/Downloads/files/build/CMakeFiles/list_install_components.dir
+/home/max/Downloads/files/build/CMakeFiles/install.dir
+/home/max/Downloads/files/build/CMakeFiles/install/local.dir
+/home/max/Downloads/files/build/CMakeFiles/install/strip.dir
+/home/max/Downloads/files/build/CMakeFiles/multichat_autogen_timestamp_deps.dir
+/home/max/Downloads/files/build/CMakeFiles/multichat_autogen.dir
