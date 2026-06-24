@@ -1,0 +1,23 @@
+# Maintainer: Dein Name <du@example.com>
+pkgname=obs-multichat
+pkgver=3.3.7
+pkgrel=1
+pkgdesc="OBS Studio dock combining Twitch and YouTube live chat and alerts"
+arch=('x86_64')
+url="https://github.com/DEINUSER/obs-multichat"
+license=('GPL2')
+depends=('obs-studio' 'qt6-base' 'qt6-websockets' 'libsecret')
+makedepends=('cmake' 'gcc' 'pkgconf')
+source=("$pkgname-$pkgver.tar.gz::https://github.com/DEINUSER/obs-multichat/archive/refs/tags/v$pkgver.tar.gz")
+sha256sums=('SKIP')
+
+build() {
+	cmake -B build -S "$pkgname-$pkgver" \
+		-DCMAKE_BUILD_TYPE=Release \
+		-DCMAKE_INSTALL_PREFIX=/usr
+	cmake --build build --parallel
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}

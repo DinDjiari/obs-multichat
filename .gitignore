@@ -1,0 +1,14 @@
+# Build output
+build/
+pkg/
+src-build/
+*.pkg.tar.*
+*.o
+*.so
+
+# Local OAuth credentials (never commit these)
+credentials.env
+
+# Editor/OS noise
+*.swp
+.DS_Store
