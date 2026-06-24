@@ -20,10 +20,10 @@ Electron, keine externe App, kein Overlay.
 - Alerts:
   - Twitch: Follow, Subscription, Gift Subs, Bits/Cheers, Raids
   - YouTube: Membership, Super Chat, Super Sticker
-- Tokens und Client-Secrets liegen im System-Schlüsselbund (libsecret). Läuft
-  kein Secret-Service-Dienst, werden sie als Fallback in
-  `~/.config/obs-multichat/tokens.json` (Rechte 0600) gespeichert, damit der
-  Login einen OBS-Neustart übersteht.
+- Tokens und Client-Secrets werden im System-Schlüsselbund (libsecret) **und**
+  zusätzlich immer in `~/.config/obs-multichat/tokens.json` (Rechte 0600)
+  gespeichert. So bleibt der Login auch ohne laufenden Secret-Service-Dienst
+  über OBS-Neustarts und Plugin-Updates hinweg erhalten.
 - Falls der automatische Browser-Login scheitert (Browser öffnet nicht oder
   Port 3000 belegt), bietet das Plugin eine manuelle Anleitung mit Einfügen der
   Weiterleitungs-Adresse.
@@ -37,7 +37,29 @@ OBS Studio 30+ (Qt6) mit Entwicklungsdateien:
 sudo pacman -S --needed base-devel cmake obs-studio qt6-base qt6-websockets libsecret pkgconf
 ```
 
-## Bauen & Installieren
+## Installation
+
+### Schnellinstallation von GitHub (empfohlen)
+
+```
+git clone https://github.com/DinDjiari/obs-multichat.git
+cd obs-multichat
+makepkg -si
+```
+
+`makepkg` baut das Plugin und installiert es via pacman (fragt nach dem
+sudo-Passwort). Danach OBS neu starten.
+
+### Über das AUR (sobald verfügbar)
+
+```
+yay -S obs-multichat
+```
+
+Hinweis: Die AUR-Neuregistrierung war zuletzt seitens Arch vorübergehend
+deaktiviert; bis das Paket dort liegt, nutze die Schnellinstallation oben.
+
+## Bauen & Installieren (Entwicklung)
 
 ### Variante A: Paket via makepkg (systemweit, /usr)
 
@@ -64,35 +86,37 @@ Danach OBS neu starten. Die Docks erscheinen unter **Docks → Multichat** und
 **Docks → Multichat Alerts**; die Einstellungen unter **Werkzeuge → Multichat
 Settings**.
 
-## Ein-Klick-Login (Felder ausblenden)
+## Erste Einrichtung (Setup-Assistent)
 
-Ein Login **ganz ohne** Client ID ist bei Twitch und Google technisch nicht
-möglich — jede „Mit … anmelden“-Schaltfläche hat eine Client ID, die der
-Entwickler fest eingebaut hat. Du kannst dir aber genau dieses Erlebnis bauen:
-trag deine IDs **einmal** in `credentials.env` ein, dann werden sie beim Bauen
-fest eingebacken, die Eingabefelder verschwinden und es bleibt nur der
-Login-Button (klicken → Weiterleitung → angemeldet).
+Beim ersten Start öffnet sich automatisch ein Einrichtungs-Assistent (später
+erreichbar über **Werkzeuge → Multichat Setup** oder den Button
+„Setup wizard…“ im Einstellungsfenster). Er hat Knöpfe, die die Twitch- und
+Google-Konsole öffnen, und Felder für die Zugangsdaten. „Save“ schreibt sie
+nach `~/.config/obs-multichat/credentials.env`; danach ist es Ein-Klick-Login.
 
-1. Apps einmalig registrieren (siehe „OAuth einrichten“ unten):
-   - Twitch: Public client, Redirect `http://localhost:3000` → Client ID
-   - Google: Desktop-App → Client ID + Secret
-2. In `credentials.env` eintragen:
-   ```
-   TWITCH_CLIENT_ID=deine_twitch_client_id
-   YOUTUBE_CLIENT_ID=deine_google_client_id
-   YOUTUBE_CLIENT_SECRET=dein_google_secret
-   ```
-3. `./scripts/update.sh` (oder `makepkg -sif`) – fertig.
+Ein Login **ganz ohne** eigene Client ID ist bei Twitch und Google technisch
+nicht möglich — jede „Mit … anmelden“-Schaltfläche hat eine Client ID, die der
+Entwickler fest eingebaut hat. Aus Sicherheitsgründen liefert dieses Plugin
+**keine** fremden Schlüssel mit; jede Person hinterlegt einmalig ihre eigenen
+(kostenlos, ein paar Minuten). Wie das geht, steht unter „OAuth einrichten“.
 
-Leere Werte lassen das jeweilige Feld weiterhin im Einstellungsfenster sichtbar,
-sodass du die ID stattdessen dort eintragen kannst (bleibt dauerhaft gespeichert).
-Hinweis: Beim erneuten Entpacken eines neuen Tarballs wird `credentials.env`
-überschrieben — vorher sichern oder Werte erneut eintragen.
+### Schlüssel hinterlegen (zwei Wege)
 
+- **Setup-Assistent** (einfachster Weg): Werte eintragen, „Save“. Fertig.
+- **Manuell:** Datei `~/.config/obs-multichat/credentials.env` anlegen mit:
+  ```
+  TWITCH_CLIENT_ID=deine_twitch_client_id
+  YOUTUBE_CLIENT_ID=deine_google_client_id
+  YOUTUBE_CLIENT_SECRET=dein_google_secret
+  ```
 
+Das Plugin liest diese Datei zur Laufzeit. Sind dort Werte hinterlegt, blendet
+das Einstellungsfenster die jeweiligen Felder aus — es bleibt nur der
+Login-Button. Ein erneutes Bauen überschreibt die Datei nicht. Wahlweise kann
+man die IDs auch direkt in den Feldern des Einstellungsfensters eintragen
+(bleibt dauerhaft in `config.json` gespeichert).
 
-Das Plugin liefert keine fremden Zugangsdaten mit; du trägst im
-Einstellungsfenster deine eigenen ein.
+## OAuth einrichten
 
 ### Twitch (Implicit Flow, ohne Secret + Loopback)
 
